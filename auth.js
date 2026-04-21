@@ -7,11 +7,6 @@ function getAuthToken() {
   return localStorage.getItem('authToken');
 }
 
-// Check if user is logged in
-function isLoggedIn() {
-  return !!getAuthToken();
-}
-
 // Verify user is authenticated
 async function verifyAuth() {
   const token = getAuthToken();
