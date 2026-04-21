@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Details</title>
+  <link rel="icon" type="image/png" href="movie.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- NAVBAR -->
+  <header class="navbar" role="banner">
+    <a href="/" class="logo" aria-label="ThePortal - Go to homepage">ThePortal</a>
+
+    <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-menu">
+      <span class="hamburger-line" aria-hidden="true"></span>
+      <span class="hamburger-line" aria-hidden="true"></span>
+      <span class="hamburger-line" aria-hidden="true"></span>
+    </button>
+
+    <nav id="nav-menu" role="navigation" aria-label="Primary navigation">
+      <ul class="nav-list" role="list">
+
+        <!-- Search -->
+        <li class="nav-item nav-item--search" role="none">
+          <div class="search-wrapper">
+            <button class="nav-link" id="search-toggle" aria-label="Open search" aria-expanded="false" aria-controls="search-input-wrapper">Search</button>
+            <div class="search-input-wrapper" id="search-input-wrapper" role="search" aria-label="Site search" hidden>
+              <label for="search-input" class="sr-only">Search</label>
+              <input type="search" id="search-input" class="search-input" placeholder="Type to search…" aria-label="Search query" autocomplete="off" aria-autocomplete="list" aria-controls="search-results" />
+              <button class="search-close" id="search-close" aria-label="Close search">✕</button>
+              <div class="search-results" id="search-results" role="listbox" hidden>
+                <div class="search-results-inner"></div>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <!-- Lists — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="lists.html" class="nav-link" aria-label="View all lists">Lists</a>
+        </li>
+
+        <!-- Bored? — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="bored.html" class="nav-link" aria-label="Find something interesting">Bored?</a>
+        </li>
+
+        <!-- Sign In — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="signin.html" class="nav-link" aria-label="Sign in to your account">Sign In</a>
+        </li>
+
+        <!-- Theme toggle -->
+        <li class="nav-item" role="none">
+          <button class="theme-toggle" id="theme-toggle" aria-label="Switch to light mode" aria-pressed="false" title="Toggle dark/light mode">
+            <svg class="icon icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+        </li>
+
+      </ul>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="main" tabindex="-1" aria-label="Main content">
+
+    <!-- Movie Detail Section -->
+    <section class="movie-detail-section" aria-labelledby="movie-detail-heading">
+      <div class="movie-detail-wrapper">
+        <div class="movie-detail-hero" id="movie-detail" role="region" aria-label="Movie details">
+          <div style="color: var(--text-muted); padding: 40px; text-align: center;">Loading movie details…</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="sr-only" aria-live="polite" aria-atomic="true" id="live-region"></div>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <p>&copy; 2026 ThePortal. All rights reserved.</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="movie-detail.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,1880 @@
+/* ============================================================
+   THEPORTAL — style.css
+   ============================================================ */
+
+/* --- Dark Theme (default) --- */
+[data-theme="dark"] {
+  --primary:        #FF6B8B;
+  --primary-dark:   #cc4466;
+  --primary-light:  #ffb3c6;
+  --primary-muted:  rgba(255, 107, 139, 0.12);
+  --bg:             #181818;
+  --bg-card:        #232323;
+  --bg-card-hover:  #2a2a2a;
+  --bg-dropdown:    #2c2c2c;
+  --bg-modal:       #242424;
+  --bg-nav:         rgba(24, 24, 24, 0.90);
+  --border:         rgba(255,255,255,0.07);
+  --border-focus:   #FF6B8B;
+  --text-primary:   #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --text-muted:     #555;
+  --shadow-card:    0 8px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-card-hover: 0 16px 60px rgba(0,0,0,0.7), 0 4px 16px rgba(255,107,139,0.12);
+  --shadow-modal:   0 24px 80px rgba(0,0,0,0.7);
+  --shadow-nav:     0 2px 24px rgba(0,0,0,0.5);
+  --backdrop-color: rgba(0,0,0,0.65);
+}
+
+/* --- Light Theme --- */
+[data-theme="light"] {
+  --primary:        #cc3355;
+  --primary-dark:   #a0203d;
+  --primary-light:  #ff6b8b;
+  --primary-muted:  rgba(204, 51, 85, 0.1);
+  --bg:             #f2f2f0;
+  --bg-card:        #ffffff;
+  --bg-card-hover:  #fafafa;
+  --bg-dropdown:    #ffffff;
+  --bg-modal:       #ffffff;
+  --bg-nav:         rgba(242, 242, 240, 0.92);
+  --border:         rgba(0,0,0,0.08);
+  --border-focus:   #cc3355;
+  --text-primary:   #1a1a1a;
+  --text-secondary: #555;
+  --text-muted:     #999;
+  --shadow-card:    0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+  --shadow-card-hover: 0 12px 40px rgba(0,0,0,0.14), 0 2px 8px rgba(204,51,85,0.08);
+  --shadow-modal:   0 24px 80px rgba(0,0,0,0.18);
+  --shadow-nav:     0 2px 16px rgba(0,0,0,0.08);
+  --backdrop-color: rgba(0,0,0,0.4);
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+button { font-family: inherit; cursor: pointer; background: none; border: none; color: inherit; }
+
+/* --- Skip Link --- */
+.skip-link {
+  position: fixed;
+  top: -100%; left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 0 0 8px 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 10000;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: 0; outline: none; }
+
+/* --- Screen-reader only --- */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+:root { --nav-height: 68px; --transition: 0.22s cubic-bezier(0.4,0,0.2,1); }
+
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nav-height);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(20px, 5vw, 60px);
+  background: var(--bg-nav);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-nav);
+  z-index: 1000;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Logo — pink by default, underline on hover */
+.logo {
+  font-size: 1.45rem; font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--primary);           /* pink by default */
+  position: relative; flex-shrink: 0;
+  transition: color var(--transition);
+}
+.logo::after {
+  content: '';
+  position: absolute; bottom: -2px; left: 0;
+  width: 100%; height: 2px;
+  background: var(--primary);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform var(--transition);
+}
+.logo:hover::after,
+.logo:focus-visible::after { transform: scaleX(1); }
+.logo:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 4px; border-radius: 4px; }
+
+/* Nav list */
+.nav-list { display: flex; align-items: center; gap: 2px; }
+.nav-item { position: relative; }
+
+/* Nav links — plain text style, grey → pink on hover */
+.nav-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 8px 14px;
+  font-size: 0.9rem; font-weight: 500;
+  color: var(--text-secondary);
+  background: none; border: none;
+  border-radius: 6px;
+  transition: color var(--transition), background var(--transition);
+  white-space: nowrap;
+}
+.nav-link:hover,
+.nav-link:focus-visible {
+  color: var(--primary);
+}
+.nav-link:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+/* Dropdown arrow rotation */
+.dropdown-arrow { font-size: 0.72rem; display: inline-block; transition: transform var(--transition); }
+.nav-link--dropdown[aria-expanded="true"] .dropdown-arrow { transform: rotate(180deg); }
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  min-width: 150px;
+  background: var(--bg-dropdown);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  padding: 6px; z-index: 200;
+  transform-origin: top right;
+  animation: dropdownIn 0.18s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.dropdown-menu[hidden] { display: none; }
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dropdown-item {
+  display: block; padding: 10px 14px;
+  font-size: 0.88rem; font-weight: 500;
+  color: var(--text-secondary); border-radius: 7px;
+  transition: color var(--transition), background var(--transition);
+}
+.dropdown-item:hover,
+.dropdown-item:focus-visible { color: var(--primary); background: var(--primary-muted); outline: none; }
+.dropdown-item:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+
+/* --- Search bar --- */
+.search-wrapper { position: relative; display: flex; align-items: center; }
+
+.search-input-wrapper {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 6px 4px 14px;
+  animation: searchIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.search-input-wrapper[hidden] { display: none; }
+@keyframes searchIn { from { opacity: 0; transform: scaleX(0.85); } to { opacity: 1; transform: scaleX(1); } }
+
+.search-input {
+  background: none; border: none;
+  color: var(--text-primary); font-family: inherit; font-size: 0.88rem;
+  width: 200px; outline: none;
+}
+.search-input:focus { outline: none; box-shadow: none; }
+.search-input::placeholder { color: var(--text-muted); }
+.search-input-wrapper:focus-within { border-color: var(--border-focus); }
+
+.search-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; color: var(--text-muted);
+  transition: background var(--transition), color var(--transition);
+}
+.search-close:hover { background: var(--primary-muted); color: var(--primary); }
+.search-close:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+/* --- Search results dropdown --- */
+.search-results {
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-top: none; border-radius: 0 0 8px 8px;
+  max-height: 400px; overflow-y: auto;
+  margin-top: -1px; z-index: 100;
+  animation: searchResultsIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.search-results[hidden] { display: none; }
+@keyframes searchResultsIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+.search-results-inner {
+  display: flex; flex-direction: column;
+}
+
+.search-result-item {
+  display: flex; gap: 12px; padding: 12px 14px;
+  border-bottom: 1px solid var(--border); cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  color: var(--text-secondary); text-decoration: none;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover,
+.search-result-item:focus-visible {
+  background: var(--bg-card-hover); color: var(--primary); outline: none;
+}
+.search-result-item:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+
+.search-result-poster {
+  width: 40px; height: 56px; border-radius: 4px;
+  background: var(--bg-dropdown); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; color: var(--text-muted); text-align: center;
+  overflow: hidden;
+}
+.search-result-poster img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.search-result-content {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+}
+
+.search-result-title {
+  font-weight: 600; font-size: 0.9rem; color: var(--text-primary);
+  margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.search-result-meta {
+  font-size: 0.75rem; color: var(--text-muted);
+}
+
+.search-no-results {
+  padding: 24px 14px; text-align: center;
+  color: var(--text-muted); font-size: 0.88rem;
+}
+
+/* --- Theme toggle --- */
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  transition: color var(--transition), background var(--transition);
+}
+.theme-toggle:hover { color: var(--primary); background: var(--primary-muted); }
+.theme-toggle:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+/* Icon switching */
+[data-theme="dark"] .icon-sun  { display: none; }
+[data-theme="dark"] .icon-moon { display: block; }
+[data-theme="light"] .icon-moon { display: none; }
+[data-theme="light"] .icon-sun  { display: block; }
+
+/* --- Hamburger (mobile) --- */
+.hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  padding: 8px; border-radius: 8px;
+  transition: background var(--transition);
+}
+.hamburger:hover { background: var(--primary-muted); }
+.hamburger:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+.hamburger-line {
+  display: block; width: 22px; height: 2px;
+  background: var(--text-secondary); border-radius: 2px;
+  transition: transform var(--transition), opacity var(--transition);
+}
+.hamburger[aria-expanded="true"] .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger[aria-expanded="true"] .hamburger-line:nth-child(2) { opacity: 0; }
+.hamburger[aria-expanded="true"] .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+.main {
+  padding-top: calc(var(--nav-height) + 60px);
+  padding-bottom: 100px; min-height: 100vh;
+}
+.main:focus { outline: none; }
+
+/* Hero */
+.hero {
+  text-align: center; padding: 0 20px 72px;
+  max-width: 680px; margin: 0 auto;
+}
+.hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 700;
+  letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px;
+}
+.hero-accent { color: var(--primary); }
+.hero-subtitle { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--text-secondary); }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.cards-section {
+  padding: 0 clamp(20px, 5vw, 60px);
+  max-width: 1280px; margin: 0 auto;
+}
+
+/* Featured Movie Section */
+.featured-movie-section {
+  padding: 0 clamp(20px, 5vw, 60px) 60px;
+  display: flex; justify-content: center;
+}
+
+.featured-movie-container {
+  display: flex; justify-content: center; width: 100%;
+}
+
+.featured-movie-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 0;
+  display: flex; flex-direction: row; align-items: stretch; gap: 0;
+  transition: box-shadow var(--transition), border-color var(--transition), cursor 0.2s;
+}
+
+.featured-movie-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: rgba(255, 107, 139, 0.2);
+}
+
+.featured-movie-poster-wrapper {
+  flex-shrink: 0; display: flex; justify-content: center; align-items: center;
+  width: 33.333%;
+  padding: 28px;
+}
+
+.featured-movie-poster {
+  width: 100%; max-width: 150px; height: auto; aspect-ratio: 2/3;
+  border-radius: 8px; object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.featured-movie-poster-placeholder {
+  width: 100%; max-width: 150px; aspect-ratio: 2/3;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 2px dashed var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.featured-movie-content {
+  display: flex; flex-direction: column; gap: 8px; width: 66.667%; 
+  text-align: left; padding: 28px; justify-content: center;
+}
+
+.featured-movie-title {
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.featured-movie-meta {
+  display: flex; flex-direction: row; gap: 16px; align-items: center;
+}
+
+.featured-movie-rating,
+.featured-movie-my-rating {
+  font-size: 0.9rem; font-weight: 500;
+  padding: 6px 12px; border-radius: 4px;
+  display: inline-block; white-space: nowrap;
+}
+
+.featured-movie-rating {
+  background-color: #fbb034;
+  color: #000;
+}
+
+.featured-movie-my-rating {
+  background-color: #c4dff6;
+  color: #000;
+}
+
+.featured-movie-details {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+}
+
+.featured-movie-year,
+.featured-movie-genres {
+  font-size: 0.85rem; color: var(--text-secondary);
+}
+
+.featured-movie-description {
+  color: var(--text-secondary); font-size: 0.9rem;
+  line-height: 1.6;
+  text-align: left;
+  max-width: 350px;
+}
+
+.featured-movie-link:hover {
+  color: var(--primary-light);
+}
+
+.featured-movie-link:focus-visible {
+  outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: 4px;
+}
+
+/* ============================================================
+   MOVIE DETAIL PAGE
+   ============================================================ */
+.movie-detail-section {
+  padding: 80px clamp(20px, 5vw, 60px) 60px;
+  min-height: calc(100vh - 68px - 200px);
+}
+
+.movie-detail-wrapper {
+  display: flex; flex-direction: column; gap: 30px;
+  max-width: 1000px; margin: 0 auto;
+}
+
+.movie-detail-hero {
+  position: relative;
+}
+
+.movie-detail-backdrop {
+  position: absolute;
+  top: -80px; left: -60px; right: -60px;
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px) brightness(0.4);
+  z-index: -1;
+  border-radius: 16px;
+}
+
+.movie-detail-content-wrapper {
+  display: flex; flex-direction: row; gap: 40px;
+  align-items: flex-start;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.movie-detail-poster-section {
+  flex-shrink: 0;
+  width: 200px;
+}
+
+.movie-detail-poster {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2/3;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.movie-detail-poster-placeholder {
+  width: 100%;
+  aspect-ratio: 2/3;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 2px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.movie-detail-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.movie-detail-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.movie-detail-ratings {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.detail-rating-badge {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.detail-rating-imdb {
+  background-color: #fbb034;
+  color: #000;
+}
+
+.detail-rating-mine {
+  background-color: #c4dff6;
+  color: #000;
+}
+
+.rating-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.rating-label-inline {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.rating-divider {
+  color: var(--text-muted);
+}
+
+.movie-detail-meta-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 12px 0;
+  width: 100%;
+  max-width: none;
+}
+
+.movie-detail-year {
+  display: inline;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.movie-detail-genres {
+  display: inline;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  flex: 1 1 auto;
+}
+
+.movie-detail-year::after {
+  content: ' •';
+  margin: 0 8px;
+  color: var(--text-muted);
+}
+
+.movie-detail-directors {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.movie-detail-description {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin: 0;
+  max-width: 500px;
+}
+
+.movie-wishlist-btn {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--primary-muted);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.movie-wishlist-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.movie-wishlist-btn.in-wishlist {
+  background: var(--primary);
+  color: #fff;
+}
+
+.movie-wishlist-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Movie detail responsive */
+@media (max-width: 768px) {
+  .movie-detail-section {
+    padding: 100px clamp(20px, 5vw, 40px) 40px;
+  }
+  
+  .movie-detail-content-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  
+  .movie-detail-poster-section {
+    width: 150px;
+  }
+  
+  .movie-detail-title {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+  
+  .movie-detail-meta-info {
+    justify-content: center;
+  }
+  
+  .movie-detail-ratings {
+    justify-content: center;
+  }
+  
+  .movie-detail-description {
+    text-align: center;
+  }
+  
+  .movie-detail-backdrop {
+    display: none;
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  transform: translateY(0);
+  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition), background 0.3s ease;
+  overflow: hidden;
+}
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-5px);
+  border-color: rgba(255,107,139,0.2);
+}
+
+.card-preview { padding: 28px 28px 22px; }
+
+.card-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+
+.card-tag {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--primary-muted); color: var(--primary);
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.card-count { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+
+/* Title button — resets button styles, makes title clickable */
+.card-title-btn {
+  display: block; width: 100%; text-align: left;
+  background: none; border: none; padding: 0; margin-bottom: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.card-title-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 4px; }
+
+.card-title {
+  font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--text-primary);
+  transition: color var(--transition);
+}
+.card-title-btn:hover .card-title { color: var(--primary); }
+
+.card-teaser {
+  font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.card-fade {
+  height: 32px; margin-top: -8px;
+  background: linear-gradient(to bottom, transparent, var(--bg-card));
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.card-toggle {
+  display: flex; align-items: center; gap: 7px;
+  margin-top: 12px; padding: 6px 0;
+  font-size: 0.85rem; font-weight: 600; color: var(--primary);
+  transition: color var(--transition), gap var(--transition);
+}
+.card-toggle:hover { color: var(--primary-light); gap: 10px; }
+
+.card-poster {
+  width: 100%;
+  height: 200px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+.card-toggle:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 4px; border-radius: 4px; }
+
+.toggle-icon { font-size: 1rem; display: inline-block; }
+
+/* ============================================================
+   THRILLER CARD STYLES
+   ============================================================ */
+#thriller-card .card-preview {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+#thriller-card .card-title-btn {
+  margin-bottom: 8px;
+}
+
+#thriller-card .card-teaser {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.thriller-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.thriller-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.thriller-list-item:last-child {
+  border-bottom: none;
+}
+
+.thriller-link-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+  flex: 1;
+  min-width: 0;
+}
+
+.thriller-link-wrapper:hover {
+  color: var(--primary-light);
+}
+
+.thriller-link-wrapper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.thriller-poster-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.thriller-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thriller-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.thriller-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.thriller-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.thriller-ratings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   ROMANCE CARD STYLES
+   ============================================================ */
+#romance-card .card-preview {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+#romance-card .card-title-btn {
+  margin-bottom: 8px;
+}
+
+#romance-card .card-teaser {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.romance-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.romance-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.romance-list-item:last-child {
+  border-bottom: none;
+}
+
+.romance-link-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+  flex: 1;
+  min-width: 0;
+}
+
+.romance-link-wrapper:hover {
+  color: var(--primary-light);
+}
+
+.romance-link-wrapper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.romance-poster-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.romance-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.romance-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.romance-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.romance-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.romance-ratings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   HORROR CARD STYLES
+   ============================================================ */
+#horror-card .card-preview {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+#horror-card .card-title-btn {
+  margin-bottom: 8px;
+}
+
+#horror-card .card-teaser {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.horror-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.horror-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.horror-list-item:last-child {
+  border-bottom: none;
+}
+
+.horror-link-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+  flex: 1;
+  min-width: 0;
+}
+
+.horror-link-wrapper:hover {
+  color: var(--primary-light);
+}
+
+.horror-link-wrapper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.horror-poster-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.horror-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.horror-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.horror-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.horror-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.horror-ratings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   COMEDY CARD STYLES
+   ============================================================ */
+#comedy-card .card-preview {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+#comedy-card .card-title-btn {
+  margin-bottom: 8px;
+}
+
+#comedy-card .card-teaser {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.comedy-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comedy-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.comedy-list-item:last-child {
+  border-bottom: none;
+}
+
+.comedy-link-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+  flex: 1;
+  min-width: 0;
+}
+
+.comedy-link-wrapper:hover {
+  color: var(--primary-light);
+}
+
+.comedy-link-wrapper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.comedy-poster-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.comedy-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.comedy-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.comedy-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.comedy-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.comedy-ratings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   DRAMA CARD STYLES
+   ============================================================ */
+#drama-card .card-preview {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+#drama-card .card-title-btn {
+  margin-bottom: 8px;
+}
+
+#drama-card .card-teaser {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.drama-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.drama-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.drama-list-item:last-child {
+  border-bottom: none;
+}
+
+.drama-link-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+  flex: 1;
+  min-width: 0;
+}
+
+.drama-link-wrapper:hover {
+  color: var(--primary-light);
+}
+
+.drama-link-wrapper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.drama-poster-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.drama-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.drama-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.drama-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drama-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.drama-ratings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   SCI-FI CARD STYLES
+   ============================================================ */
+#scifi-card .card-preview {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+#scifi-card .card-title-btn {
+  margin-bottom: 8px;
+}
+
+#scifi-card .card-teaser {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.scifi-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scifi-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.scifi-list-item:last-child {
+  border-bottom: none;
+}
+
+.scifi-link-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+  flex: 1;
+  min-width: 0;
+}
+
+.scifi-link-wrapper:hover {
+  color: var(--primary-light);
+}
+
+.scifi-link-wrapper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.scifi-poster-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.scifi-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scifi-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.scifi-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scifi-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.scifi-ratings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   FANTASY CARD STYLES
+   ============================================================ */
+#fantasy-card .card-preview {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+#fantasy-card .card-title-btn {
+  margin-bottom: 8px;
+}
+
+#fantasy-card .card-teaser {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.fantasy-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fantasy-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.fantasy-list-item:last-child {
+  border-bottom: none;
+}
+
+.fantasy-link-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+  flex: 1;
+  min-width: 0;
+}
+
+.fantasy-link-wrapper:hover {
+  color: var(--primary-light);
+}
+
+.fantasy-link-wrapper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.fantasy-poster-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fantasy-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fantasy-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.fantasy-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fantasy-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.fantasy-ratings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   ACTION CARD STYLES
+   ============================================================ */
+#action-card .card-preview {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+#action-card .card-title-btn {
+  margin-bottom: 8px;
+}
+
+#action-card .card-teaser {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.action-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.action-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.action-list-item:last-child {
+  border-bottom: none;
+}
+
+.action-link-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+  flex: 1;
+  min-width: 0;
+}
+
+.action-link-wrapper:hover {
+  color: var(--primary-light);
+}
+
+.action-link-wrapper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.action-poster-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.action-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.action-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.action-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.action-ratings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 2000;
+  background: var(--backdrop-color);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: backdropIn 0.25s ease forwards;
+}
+.modal-backdrop[hidden] { display: none; }
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  background: var(--bg-modal);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-modal);
+  width: 100%; max-width: 540px;
+  max-height: 85vh;
+  display: flex; flex-direction: column;
+  animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transition: background 0.3s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.88) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 8px;
+  position: relative; flex-shrink: 0;
+}
+
+.modal-meta { display: flex; align-items: center; gap: 10px; }
+
+.modal-title {
+  font-size: 1.55rem; font-weight: 700; letter-spacing: -0.03em;
+  color: var(--text-primary); padding-right: 36px;
+}
+
+.modal-close {
+  position: absolute; top: 24px; right: 24px;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+  transition: color var(--transition), background var(--transition);
+}
+.modal-close:hover { color: var(--primary); background: var(--primary-muted); }
+.modal-close:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+.modal-body {
+  overflow-y: auto; padding: 8px 28px 28px;
+  flex: 1;
+  /* Scrollbar styling */
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.modal-body::-webkit-scrollbar { width: 4px; }
+.modal-body::-webkit-scrollbar-track { background: transparent; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* Movie Quote specific styles */
+.movie-quote-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.movie-quote-content img {
+  max-width: 100%;
+  max-height: 60vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: none;
+  border-radius: 12px;
+}
+
+/* Shared list styles */
+.card-list { display: flex; flex-direction: column; padding-top: 12px; }
+
+.card-list-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.card-list-item:last-child { border-bottom: none; }
+
+.item-num {
+  font-size: 0.7rem; font-weight: 700; color: var(--primary);
+  letter-spacing: 0.08em; padding-top: 2px; min-width: 24px; flex-shrink: 0;
+}
+
+.card-list-item strong { display: block; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.card-list-item span   { color: var(--text-secondary); font-size: 0.84rem; }
+
+/* APOD & Quote Content */
+.apod-content { padding-top: 12px; }
+.apod-content img,
+.apod-content iframe { max-width: 100%; height: auto; }
+
+.quote-content { display: flex; align-items: center; justify-content: center; min-height: 300px; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  padding: 40px 20px;
+  text-align: center;
+  margin-top: auto;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* ============================================================
+   FOCUS ring — global
+   ============================================================ */
+:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .hamburger { display: flex; }
+
+  nav#nav-menu {
+    position: fixed; top: var(--nav-height); left: 0; right: 0;
+    background: var(--bg-nav);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px 24px; z-index: 900;
+    transform: translateY(-8px); opacity: 0; pointer-events: none;
+    transition: opacity var(--transition), transform var(--transition);
+  }
+  nav#nav-menu.open { transform: translateY(0); opacity: 1; pointer-events: all; }
+
+  .nav-list { flex-direction: column; align-items: stretch; gap: 4px; }
+  .nav-link { padding: 12px 16px; font-size: 1rem; }
+
+  .search-input { width: 100%; }
+
+  /* Featured movie card responsive */
+  .featured-movie-card { flex-direction: column; align-items: center; text-align: center; padding: 20px; }
+  .featured-movie-poster-wrapper { width: 100%; display: flex; justify-content: center; max-width: none; padding: 0 0 20px 0; }
+  .featured-movie-poster { width: 150px; }
+  .featured-movie-poster-placeholder { width: 150px; }
+  .featured-movie-content { width: 100%; text-align: center; padding: 0; justify-content: flex-start; }
+  .featured-movie-meta { justify-content: center; flex-direction: row; gap: 12px; }
+  .featured-movie-details { justify-content: center; }
+  .featured-movie-description { font-size: 0.85rem; }
+  .search-input-wrapper { width: 100%; }
+
+  .dropdown-menu {
+    position: static; box-shadow: none; border: none;
+    background: var(--primary-muted); margin: 4px 0 4px 12px;
+    border-radius: 8px; animation: none;
+  }
+
+  .cards-grid { grid-template-columns: 1fr; }
+
+  .modal { max-width: 100%; border-radius: 16px 16px 0 0; align-self: flex-end; max-height: 90vh; }
+  .modal-backdrop { align-items: flex-end; padding: 0; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { font-size: 2rem; }
+  .card-preview { padding: 22px 20px 16px; }
+  .modal-header { padding: 22px 20px 16px; }
+  .modal-body { padding: 8px 20px 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

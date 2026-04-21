@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThePortal</title>
+  <link rel="icon" type="image/png" href="movie.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- NAVBAR -->
+  <header class="navbar" role="banner">
+    <a href="/" class="logo" aria-label="ThePortal - Go to homepage">ThePortal</a>
+
+    <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-menu">
+      <span class="hamburger-line" aria-hidden="true"></span>
+      <span class="hamburger-line" aria-hidden="true"></span>
+      <span class="hamburger-line" aria-hidden="true"></span>
+    </button>
+
+    <nav id="nav-menu" role="navigation" aria-label="Primary navigation">
+      <ul class="nav-list" role="list">
+
+        <!-- Search -->
+        <li class="nav-item nav-item--search" role="none">
+          <div class="search-wrapper">
+            <button class="nav-link" id="search-toggle" aria-label="Open search" aria-expanded="false" aria-controls="search-input-wrapper">Search</button>
+            <div class="search-input-wrapper" id="search-input-wrapper" role="search" aria-label="Site search" hidden>
+              <label for="search-input" class="sr-only">Search</label>
+              <input type="search" id="search-input" class="search-input" placeholder="Type to search…" aria-label="Search query" autocomplete="off" aria-autocomplete="list" aria-controls="search-results" />
+              <button class="search-close" id="search-close" aria-label="Close search">✕</button>
+              <div class="search-results" id="search-results" role="listbox" hidden>
+                <div class="search-results-inner"></div>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <!-- Lists — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="lists.html" class="nav-link" aria-label="View all lists">Lists</a>
+        </li>
+
+        <!-- Bored? — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="bored.html" class="nav-link" aria-label="Find something interesting">Bored?</a>
+        </li>
+
+        <!-- Sign In — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="signin.html" class="nav-link" aria-label="Sign in to your account">Sign In</a>
+        </li>
+
+        <!-- Theme toggle -->
+        <li class="nav-item" role="none">
+          <button class="theme-toggle" id="theme-toggle" aria-label="Switch to light mode" aria-pressed="false" title="Toggle dark/light mode">
+            <svg class="icon icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+        </li>
+
+      </ul>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="main" tabindex="-1" aria-label="Main content">
+
+    <section class="hero" aria-labelledby="hero-heading">
+      <h1 id="hero-heading" class="hero-title">Movies, <span class="hero-accent">Curated.</span></h1>
+      <p class="hero-subtitle">find movies that match your taste.</p>
+    </section>
+
+    <!-- Featured Movie Section -->
+    <section class="featured-movie-section" aria-labelledby="featured-movie-heading">
+      <h2 id="featured-movie-heading" class="sr-only">Last Watched Movie</h2>
+      <div class="featured-movie-container">
+        <div class="featured-movie-card" id="featured-movie" role="link" tabindex="0" aria-label="Last watched movie - click to view details">
+          <div class="featured-movie-poster-wrapper">
+            <img id="movie-poster" src="" alt="" class="featured-movie-poster" style="display: none;" />
+            <div id="movie-poster-placeholder" class="featured-movie-poster-placeholder">
+              <p>Poster Not Found</p>
+            </div>
+          </div>
+          <div class="featured-movie-content">
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px;">Last Watched</p>
+            <h3 class="featured-movie-title" id="movie-title">Loading…</h3>
+            <div class="featured-movie-meta">
+              <span class="featured-movie-rating" id="movie-rating"></span>
+              <span class="featured-movie-my-rating" id="movie-your-rating"></span>
+            </div>
+            <div class="featured-movie-details">
+              <span class="featured-movie-year" id="movie-year"></span>
+              <span class="featured-movie-genres" id="movie-genres"></span>
+            </div>
+            <p class="featured-movie-description" id="movie-description">Loading description…</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cards-section" aria-labelledby="cards-heading">
+      <h2 id="cards-heading" class="sr-only">Featured Lists</h2>
+      <div class="cards-grid">
+
+        <!-- Thriller Movies Card -->
+        <article class="card" id="thriller-card" aria-labelledby="thriller-card-title">
+          <div class="card-poster" id="thriller-poster-preview" style="display: none;">
+            <img id="thriller-poster-img" src="" alt="" style="display: none;" />
+            <div id="thriller-poster-placeholder" class="card-poster-placeholder"></div>
+          </div>
+          <div class="card-preview">
+            <button class="card-title-btn" id="thriller-toggle" aria-haspopup="dialog" aria-label="Open Thriller Movies list">
+              <h3 class="card-title" id="thriller-card-title">Thriller Movies</h3>
+            </button>
+            <p class="card-teaser">Top 10 Thriller movies of recent times.</p>
+          </div>
+        </article>
+
+        <!-- Romance Movies Card -->
+        <article class="card" id="romance-card" aria-labelledby="romance-card-title">
+          <div class="card-poster" id="romance-poster-preview" style="display: none;">
+            <img id="romance-poster-img" src="" alt="" style="display: none;" />
+            <div id="romance-poster-placeholder" class="card-poster-placeholder"></div>
+          </div>
+          <div class="card-preview">
+            <button class="card-title-btn" id="romance-toggle" aria-haspopup="dialog" aria-label="Open Romance Movies list">
+              <h3 class="card-title" id="romance-card-title">Romance Movies</h3>
+            </button>
+            <p class="card-teaser">Top 10 Romance movies of recent times.</p>
+          </div>
+        </article>
+
+        <!-- Horror Movies Card -->
+        <article class="card" id="horror-card" aria-labelledby="horror-card-title">
+          <div class="card-poster" id="horror-poster-preview" style="display: none;">
+            <img id="horror-poster-img" src="" alt="" style="display: none;" />
+            <div id="horror-poster-placeholder" class="card-poster-placeholder"></div>
+          </div>
+          <div class="card-preview">
+            <button class="card-title-btn" id="horror-toggle" aria-haspopup="dialog" aria-label="Open Horror Movies list">
+              <h3 class="card-title" id="horror-card-title">Horror Movies</h3>
+            </button>
+            <p class="card-teaser">Top 10 Horror movies of recent times.</p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Thriller Movies Modal -->
+    <div class="modal-backdrop" id="thriller-modal" role="dialog" aria-modal="true" aria-labelledby="thriller-modal-title" hidden>
+      <div class="modal" tabindex="-1">
+        <div class="modal-header">
+          <h2 class="modal-title" id="thriller-modal-title">Thriller Movies</h2>
+          <button class="modal-close" id="thriller-modal-close" aria-label="Close Thriller Movies modal">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <ol class="thriller-list" id="thriller-list">
+            <li class="thriller-list-item"><span style="color: var(--text-muted);">Loading movies…</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Romance Movies Modal -->
+    <div class="modal-backdrop" id="romance-modal" role="dialog" aria-modal="true" aria-labelledby="romance-modal-title" hidden>
+      <div class="modal" tabindex="-1">
+        <div class="modal-header">
+          <h2 class="modal-title" id="romance-modal-title">Romance Movies</h2>
+          <button class="modal-close" id="romance-modal-close" aria-label="Close Romance Movies modal">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <ol class="romance-list" id="romance-list">
+            <li class="romance-list-item"><span style="color: var(--text-muted);">Loading movies…</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Horror Movies Modal -->
+    <div class="modal-backdrop" id="horror-modal" role="dialog" aria-modal="true" aria-labelledby="horror-modal-title" hidden>
+      <div class="modal" tabindex="-1">
+        <div class="modal-header">
+          <h2 class="modal-title" id="horror-modal-title">Horror Movies</h2>
+          <button class="modal-close" id="horror-modal-close" aria-label="Close Horror Movies modal">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <ol class="horror-list" id="horror-list">
+            <li class="horror-list-item"><span style="color: var(--text-muted);">Loading movies…</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+  <div class="sr-only" aria-live="polite" aria-atomic="true" id="live-region"></div>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <p>&copy; 2026 ThePortal. All rights reserved.</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

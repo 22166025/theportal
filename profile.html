@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - ThePortal</title>
+  <link rel="icon" type="image/png" href="movie.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .profile-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .profile-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .profile-card h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      color: var(--text-primary);
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--primary-muted);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .btn-danger {
+      background: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(220, 53, 69, 0.15);
+    }
+
+    .error-message {
+      background: rgba(220, 53, 69, 0.1);
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      color: #dc3545;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .success-message {
+      background: rgba(40, 167, 69, 0.1);
+      border: 1px solid rgba(40, 167, 69, 0.3);
+      color: #28a745;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .profile-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .profile-info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-info-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .profile-info-value {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .edit-mode {
+      display: none;
+    }
+
+    .edit-mode.active {
+      display: block;
+    }
+
+    .view-mode.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- NAVBAR -->
+  <header class="navbar" role="banner">
+    <a href="/" class="logo" aria-label="ThePortal - Go to homepage">ThePortal</a>
+    <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-menu">
+      <span class="hamburger-line" aria-hidden="true"></span>
+      <span class="hamburger-line" aria-hidden="true"></span>
+      <span class="hamburger-line" aria-hidden="true"></span>
+    </button>
+    <nav id="nav-menu" role="navigation" aria-label="Primary navigation">
+      <ul class="nav-list" role="list">
+        <!-- Lists — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="lists.html" class="nav-link" aria-label="View all lists">Lists</a>
+        </li>
+
+        <!-- Bored? — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="bored.html" class="nav-link" aria-label="Find something interesting">Bored?</a>
+        </li>
+
+        <!-- Sign In — plain text link (replaced by auth.js when logged in) -->
+        <li class="nav-item" role="none">
+          <a href="signin.html" class="nav-link" aria-label="Sign in to your account">Sign In</a>
+        </li>
+
+        <!-- Theme toggle -->
+        <li class="nav-item" role="none">
+          <button class="theme-toggle" id="theme-toggle" aria-label="Switch to light mode" aria-pressed="false" title="Toggle dark/light mode">
+            <svg class="icon icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="main" tabindex="-1">
+    <div class="profile-container">
+      <div class="profile-card">
+        <h1>My Profile</h1>
+
+        <div id="message-container"></div>
+
+        <!-- View Mode -->
+        <div class="view-mode" id="view-mode">
+          <div class="profile-info">
+            <div class="profile-info-item">
+              <div class="profile-info-label">Name</div>
+              <div class="profile-info-value" id="display-name">—</div>
+            </div>
+            <div class="profile-info-item">
+              <div class="profile-info-label">Username</div>
+              <div class="profile-info-value" id="display-username">—</div>
+            </div>
+            <div class="profile-info-item">
+              <div class="profile-info-label">Email</div>
+              <div class="profile-info-value" id="display-email">—</div>
+            </div>
+            <div class="profile-info-item">
+              <div class="profile-info-label">Member Since</div>
+              <div class="profile-info-value" id="display-created">—</div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" id="edit-btn">Edit Profile</button>
+            <button class="btn btn-secondary" id="wishlist-btn">View Wishlist</button>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <form class="edit-mode" id="edit-mode">
+          <div class="form-group">
+            <label for="edit-name">Full Name</label>
+            <input type="text" id="edit-name" name="name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-username">Username</label>
+            <input type="text" id="edit-username" name="username" required />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-email">Email Address</label>
+            <input type="email" id="edit-email" name="email" required />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <div id="live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    let currentUser = null;
+
+    // Load profile on page load
+    window.addEventListener('load', async () => {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        window.location.href = '/signin.html';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/user/profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load profile');
+        }
+
+        const data = await response.json();
+        currentUser = data.user;
+        displayProfile();
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        window.location.href = '/signin.html';
+      }
+    });
+
+    function displayProfile() {
+      const date = new Date(currentUser.createdAt);
+      const formatted = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+      document.getElementById('display-name').textContent = currentUser.name;
+      document.getElementById('display-username').textContent = currentUser.username;
+      document.getElementById('display-email').textContent = currentUser.email;
+      document.getElementById('display-created').textContent = formatted;
+
+      document.getElementById('edit-name').value = currentUser.name;
+      document.getElementById('edit-username').value = currentUser.username;
+      document.getElementById('edit-email').value = currentUser.email;
+    }
+
+    document.getElementById('edit-btn').addEventListener('click', () => {
+      document.getElementById('view-mode').classList.add('hidden');
+      document.getElementById('edit-mode').classList.add('active');
+    });
+
+    document.getElementById('cancel-btn').addEventListener('click', () => {
+      document.getElementById('view-mode').classList.remove('hidden');
+      document.getElementById('edit-mode').classList.remove('active');
+    });
+
+    document.getElementById('edit-mode').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('edit-name').value.trim();
+      const username = document.getElementById('edit-username').value.trim();
+      const email = document.getElementById('edit-email').value.trim();
+      const messageContainer = document.getElementById('message-container');
+      const button = e.target.querySelector('button');
+
+      messageContainer.innerHTML = '';
+      button.disabled = true;
+
+      try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/user/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ name, username, email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          messageContainer.innerHTML = `<div class="error-message">${data.error}</div>`;
+          button.disabled = false;
+          return;
+        }
+
+        currentUser = data.user;
+        displayProfile();
+
+        document.getElementById('view-mode').classList.remove('hidden');
+        document.getElementById('edit-mode').classList.remove('active');
+
+        messageContainer.innerHTML = '<div class="success-message">Profile updated successfully!</div>';
+        setTimeout(() => {
+          messageContainer.innerHTML = '';
+        }, 3000);
+      } catch (error) {
+        messageContainer.innerHTML = `<div class="error-message">An error occurred. Please try again.</div>`;
+        button.disabled = false;
+        console.error('Update error:', error);
+      }
+    });
+
+    document.getElementById('wishlist-btn').addEventListener('click', () => {
+      window.location.href = '/wishlist.html';
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('authToken');
+      window.location.href = '/signin.html';
+    });
+  </script>
+</body>
+</html>
