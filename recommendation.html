@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Recommendations | ThePortal</title>
+  <link rel="icon" type="image/png" href="movie.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">  <script>
+    // Apply saved theme immediately to prevent flash of unstyled content
+    const savedTheme = localStorage.getItem('portal-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script></head>
+<body>
+  <!-- NAVBAR -->
+  <header class="navbar" role="banner">
+    <a href="/" class="logo" aria-label="ThePortal - Go to homepage">ThePortal</a>
+    <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-menu">
+      <span class="hamburger-line" aria-hidden="true"></span>
+      <span class="hamburger-line" aria-hidden="true"></span>
+      <span class="hamburger-line" aria-hidden="true"></span>
+    </button>
+    <nav id="nav-menu" role="navigation" aria-label="Primary navigation">
+      <ul class="nav-list" role="list">
+        <!-- Lists — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="lists.html" class="nav-link" aria-label="View all lists">Lists</a>
+        </li>
+
+        <!-- Bored? — plain text link -->
+        <li class="nav-item" role="none">
+          <a href="bored.html" class="nav-link" aria-label="Find something interesting">Bored?</a>
+        </li>
+
+        <!-- Sign In — plain text link (replaced by auth.js when logged in) -->
+        <li class="nav-item" role="none">
+          <a href="signin.html" class="nav-link" aria-label="Sign in to your account">Sign In</a>
+        </li>
+
+        <!-- Theme toggle -->
+        <li class="nav-item" role="none">
+          <button class="theme-toggle" id="theme-toggle" aria-label="Switch to light mode" aria-pressed="false" title="Toggle dark/light mode">
+            <svg class="icon icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="main" tabindex="-1">
+    <div class="recommendation-container">
+      <h1>Smart Recommendations</h1>
+      <p class="subtitle">Search and select 2-3 movies you love, and we'll recommend similar ones you might enjoy</p>
+
+      <!-- Step 1: Search and Select Movies -->
+      <section class="recommendation-section">
+        <p class="select-instruction" id="select-instruction">Select 2-3 movies to get recommendations</p>
+        
+        <!-- Search Input -->
+        <div class="search-movie-wrapper">
+          <input 
+            type="text" 
+            id="movie-search-input" 
+            class="search-movie-input" 
+            placeholder="Search for a movie (e.g., 'The Outsider', 'Breaking Bad')..."
+            autocomplete="off"
+          />
+          <div class="search-movie-results" id="search-movie-results" hidden>
+            <div class="search-results-inner" id="search-results-inner"></div>
+          </div>
+        </div>
+
+        <!-- Selected Movies Display -->
+        <div class="selected-movies-section" id="selected-movies-section" style="display: none;">
+          <h3>Your Selected Movies</h3>
+          <div class="selected-movies-list" id="selected-movies-list"></div>
+        </div>
+
+        <div class="selection-actions">
+          <button id="get-recommendations-btn" class="btn btn-primary" disabled>Get Recommendations</button>
+        </div>
+      </section>
+
+      <!-- Step 2: Recommendations Display -->
+      <section class="recommendation-section" id="recommendations-section" style="display: none;">
+        <h2>Recommended for You</h2>
+        <p class="recommendation-subtitle">Based on your selected movies with your ratings of 7+</p>
+        
+        <div class="recommendations-grid" id="recommendations-grid">
+          <div class="loading-message">Finding perfect recommendations...</div>
+        </div>
+
+        <div class="recommendation-actions">
+          <button id="start-over-btn" class="btn btn-secondary">Start Over</button>
+        </div>
+      </section>
+
+      <!-- Error Message -->
+      <div id="error-message" class="error-message" style="display: none;"></div>
+    </div>
+  </main>
+
+  <div id="live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  <script src="recommendation.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -161,6 +161,11 @@
       pointer-events: none;
     }
   </style>
+  <script>
+    // Apply saved theme immediately to prevent flash of unstyled content
+    const savedTheme = localStorage.getItem('portal-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>

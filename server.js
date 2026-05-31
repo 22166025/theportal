@@ -51,13 +51,47 @@ app.use(express.json());
 /* ============================================================
    TMDB POSTER & DESCRIPTION FETCHER
    ============================================================ */
-async function fetchMovieDetails(movieTitle, movieYear) {
+async function fetchMovieDetails(movieTitle, movieYear, imdbId = null) {
   try {
-    // Search for both movies and TV series
+    // If IMDb ID available, use it for most accurate lookup (priority method)
+    if (imdbId) {
+      console.log(`🔍 Searching TMDb by IMDb ID: ${imdbId}`);
+      
+      const findUrl = `${TMDB_BASE_URL}/find/${imdbId}?api_key=${TMDB_API_KEY}&external_source=imdb_id`;
+      const findResponse = await fetch(findUrl);
+      
+      if (findResponse.ok) {
+        const findData = await findResponse.json();
+        
+        // Check movie results first
+        if (findData.movie_results && findData.movie_results.length > 0) {
+          const result = findData.movie_results[0];
+          const posterUrl = result.poster_path ? `${TMDB_IMAGE_URL}${result.poster_path}` : null;
+          const description = result.overview || null;
+          console.log(`✅ Poster found via IMDb ID (Movie): ${posterUrl}`);
+          return { poster: posterUrl, description: description };
+        }
+        
+        // Check TV results
+        if (findData.tv_results && findData.tv_results.length > 0) {
+          const result = findData.tv_results[0];
+          const posterUrl = result.poster_path ? `${TMDB_IMAGE_URL}${result.poster_path}` : null;
+          const description = result.overview || null;
+          console.log(`✅ Poster found via IMDb ID (TV): ${posterUrl}`);
+          return { poster: posterUrl, description: description };
+        }
+        
+        console.log(`⚠️  IMDb ID ${imdbId} not found on TMDb, falling back to title search`);
+      } else {
+        console.log(`⚠️  TMDb lookup by IMDb ID failed (${findResponse.status}), falling back to title search`);
+      }
+    }
+    
+    // Fallback: Search for both movies and TV series by title and year
     const movieSearchUrl = `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movieTitle)}&year=${movieYear}`;
     const tvSearchUrl = `${TMDB_BASE_URL}/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movieTitle)}&first_air_date_year=${movieYear}`;
     
-    console.log(`🎬 Searching TMDb for: ${movieTitle} (${movieYear})`);
+    console.log(`🎬 Searching TMDb by title: ${movieTitle} (${movieYear})`);
     
     // Fetch both searches in parallel
     const [movieResponse, tvResponse] = await Promise.all([
@@ -73,20 +107,43 @@ async function fetchMovieDetails(movieTitle, movieYear) {
     const movieData = await movieResponse.json();
     const tvData = await tvResponse.json();
     
-    console.log(`📊 TMDb Search Results: ${movieData.results.length} movies, ${tvData.results.length} TV series found`);
-    
-    // Combine results and prioritize by popularity/rating
+    // Combine results
     let allResults = [
       ...(movieData.results || []).map(r => ({ ...r, type: 'movie' })),
       ...(tvData.results || []).map(r => ({ ...r, type: 'tv' }))
     ];
     
-    // Sort by popularity (descending) to get the best match
-    allResults.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+    // Filter for exact title matches first, then approximate matches
+    const exactMatches = allResults.filter(r => 
+      (r.title || r.name || '').toLowerCase().trim() === movieTitle.toLowerCase().trim()
+    );
+    
+    const closeMatches = allResults.filter(r => 
+      (r.title || r.name || '').toLowerCase().includes(movieTitle.toLowerCase()) ||
+      movieTitle.toLowerCase().includes((r.title || r.name || '').toLowerCase())
+    );
+    
+    // Use exact matches, then close matches, sorted by release date proximity and popularity
+    const candidateResults = exactMatches.length > 0 ? exactMatches : closeMatches;
+    
+    // Sort by release date match, then by vote count and popularity
+    candidateResults.sort((a, b) => {
+      const aRelease = a.release_date || a.first_air_date || '';
+      const bRelease = b.release_date || b.first_air_date || '';
+      const aYear = aRelease.substring(0, 4);
+      const bYear = bRelease.substring(0, 4);
+      
+      // Prioritize matching year
+      if (aYear === String(movieYear) && bYear !== String(movieYear)) return -1;
+      if (aYear !== String(movieYear) && bYear === String(movieYear)) return 1;
+      
+      // Then sort by vote count (popularity indicator)
+      return (b.vote_count || 0) - (a.vote_count || 0);
+    });
     
     // Find the best match
-    if (allResults && allResults.length > 0) {
-      const result = allResults[0];
+    if (candidateResults && candidateResults.length > 0) {
+      const result = candidateResults[0];
       
       let posterUrl = null;
       if (result.poster_path) {
@@ -97,7 +154,7 @@ async function fetchMovieDetails(movieTitle, movieYear) {
       let description = null;
       if (result.overview) {
         description = result.overview;
-        console.log(`✅ Description found (${result.type}): ${description.substring(0, 50)}...`);
+        console.log(`✅ Description found (${result.type})`);
       } else {
         console.log(`⚠️  No description found`);
       }
@@ -337,6 +394,121 @@ app.put('/api/user/profile', protect, async (req, res) => {
 });
 
 /* ============================================================
+   PASSWORD RESET ENDPOINTS
+   ============================================================ */
+
+// Forgot Password - Check if email exists
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Please provide an email' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'No account found with this email address' });
+    }
+
+    // Email found, user can proceed to reset password
+    res.json({
+      success: true,
+      message: 'Email verified. Please proceed to reset your password.',
+      email: user.email
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Failed to process forgot password' });
+  }
+});
+
+// Reset Password - Update password directly using email
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Password has been reset successfully. Please sign in with your new password.'
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
+// Change Password (for logged-in users)
+app.post('/api/user/change-password', protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: 'New passwords do not match' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // Get user with password field
+    const user = await User.findById(req.userId).select('+password');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify current password
+    const isPasswordValid = await user.matchPassword(currentPassword);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully'
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+/* ============================================================
    WISHLIST ENDPOINTS
    ============================================================ */
 
@@ -464,7 +636,7 @@ app.get('/api/search', async (req, res) => {
     // Fetch TMDb details for top results
     const resultsWithDetails = await Promise.all(
       results.map(async (movie) => {
-        const details = await fetchMovieDetails(movie['Title'], movie['Year']);
+        const details = await fetchMovieDetails(movie['Title'], movie['Year'], movie['Const']);
         return {
           title: movie['Title'],
           year: parseInt(movie['Year']),
@@ -504,7 +676,7 @@ app.get('/api/last-movie', async (req, res) => {
   });
 
   // Fetch poster and description from TMDb
-  const movieDetails = await fetchMovieDetails(lastMovie['Title'], lastMovie['Year']);
+  const movieDetails = await fetchMovieDetails(lastMovie['Title'], lastMovie['Year'], lastMovie['Const']);
 
   // Format response with only required fields
   const movieData = {
@@ -522,6 +694,145 @@ app.get('/api/last-movie', async (req, res) => {
   };
 
   res.json(movieData);
+});
+
+/* ============================================================
+   API ENDPOINT: Get all movies for recommendations
+   ============================================================ */
+app.get('/api/movies', async (req, res) => {
+  try {
+    const movies = parseIMDbCSV();
+    
+    // Format and return all movies
+    const formattedMovies = movies.map(movie => ({
+      id: movie['Const'],
+      title: movie['Title'],
+      year: parseInt(movie['Year']),
+      genres: movie['Genres'],
+      imdbRating: parseFloat(movie['IMDb Rating']),
+      yourRating: parseInt(movie['Your Rating']),
+      directors: movie['Directors'],
+      poster: null, // Will be fetched on-demand
+      description: null
+    }));
+
+    res.json(formattedMovies);
+  } catch (error) {
+    console.error('Error fetching movies:', error);
+    res.status(500).json({ error: 'Failed to fetch movies' });
+  }
+});
+
+/* ============================================================
+   API ENDPOINT: Get recommendations based on selected movies
+   ============================================================ */
+app.post('/api/recommendations', protect, async (req, res) => {
+  try {
+    const { selectedMovieIds } = req.body;
+
+    if (!selectedMovieIds || !Array.isArray(selectedMovieIds) || selectedMovieIds.length < 2) {
+      return res.status(400).json({ error: 'Please select at least 2 movies' });
+    }
+
+    if (selectedMovieIds.length > 3) {
+      return res.status(400).json({ error: 'Please select at most 3 movies' });
+    }
+
+    const movies = parseIMDbCSV();
+    console.log(`📚 Loaded ${movies.length} movies from CSV for recommendations`);
+    if (movies.length > 0) {
+      const firstMovie = movies[0];
+      console.log(`📚 First movie Your Rating: "${firstMovie['Your Rating']}" (type: ${typeof firstMovie['Your Rating']})`);
+      console.log(`📚 First movie keys:`, Object.keys(firstMovie).join(', '));
+    }
+
+    // Find selected movies
+    const selectedMovies = movies.filter(m => selectedMovieIds.includes(m['Const']));
+
+    if (selectedMovies.length === 0) {
+      return res.status(404).json({ error: 'Selected movies not found' });
+    }
+
+    // Extract genres and directors from selected movies
+    const selectedGenres = new Set();
+    const selectedDirectors = new Set();
+    
+    selectedMovies.forEach(movie => {
+      (movie['Genres'] || '').split(',').forEach(g => selectedGenres.add(g.trim()));
+      (movie['Directors'] || '').split(',').forEach(d => selectedDirectors.add(d.trim()));
+    });
+
+    console.log(`🎯 Finding recommendations based on genres: ${Array.from(selectedGenres).join(', ')}`);
+    console.log(`📊 Filtering movies with Your Rating >= 7`);
+    console.log(`📊 First movie sample keys:`, Object.keys(movies[0] || {}));
+
+    // Find similar movies (not in selected list)
+    const recommendations = movies.filter(movie => {
+      // Skip selected movies
+      if (selectedMovieIds.includes(movie['Const'])) return false;
+
+      // Filter by Your Rating >= 7
+      const yourRating = parseInt(movie['Your Rating']);
+      console.log(`  Checking ${movie['Title']}: Your Rating="${movie['Your Rating']}" → parsed=${yourRating}, pass=${!isNaN(yourRating) && yourRating >= 7}`);
+      if (isNaN(yourRating) || yourRating < 7) return false;
+
+      // Calculate genre match score
+      const movieGenres = (movie['Genres'] || '').split(',').map(g => g.trim());
+      const genreMatches = movieGenres.filter(g => selectedGenres.has(g)).length;
+
+      // Should have at least 1 genre in common
+      return genreMatches > 0;
+    });
+    
+    console.log(`✅ Found ${recommendations.length} movies with Your Rating >= 7 and matching genres`);
+
+    // Score and sort recommendations
+    const scoredRecommendations = recommendations
+    .map(movie => {
+      // Score recommendations by genre overlap
+      const movieGenres = (movie['Genres'] || '').split(',').map(g => g.trim());
+      const genreMatches = movieGenres.filter(g => selectedGenres.has(g)).length;
+      
+      // Calculate director match
+      const movieDirectors = (movie['Directors'] || '').split(',').map(d => d.trim());
+      const directorMatches = movieDirectors.filter(d => selectedDirectors.has(d)).length;
+
+      return {
+        ...movie,
+        score: (genreMatches * 10) + (directorMatches * 5)
+      };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3); // Return top 3 recommendations
+
+    console.log(`✅ Scored and sorted ${scoredRecommendations.length} recommendations`);
+
+    // Fetch poster and description for recommendations
+    const resultsWithDetails = await Promise.all(
+      scoredRecommendations.map(async (movie) => {
+        const details = await fetchMovieDetails(movie['Title'], movie['Year'], movie['Const']);
+        const result = {
+          id: movie['Const'],
+          title: movie['Title'],
+          year: parseInt(movie['Year']),
+          genres: movie['Genres'],
+          yourRating: parseInt(movie['Your Rating']),
+          imdbRating: parseFloat(movie['IMDb Rating']),
+          directors: movie['Directors'],
+          poster: details.poster,
+          description: details.description,
+        };
+        console.log(`📺 ${result.title}: yourRating=${result.yourRating}, imdbRating=${result.imdbRating}`);
+        return result;
+      })
+    );
+
+    console.log(`✅ Sending ${resultsWithDetails.length} recommendations to client`);
+    res.json(resultsWithDetails);
+  } catch (error) {
+    console.error('Error getting recommendations:', error);
+    res.status(500).json({ error: 'Failed to get recommendations' });
+  }
 });
 
 /* ============================================================

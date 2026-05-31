@@ -124,6 +124,18 @@
               </div>
               
               <p class="movie-detail-description" id="detail-movie-description">No description available.</p>
+              
+              <div class="movie-streaming-section" id="streaming-section" style="display: none;">
+                <button class="streaming-toggle-btn" id="streaming-toggle" aria-expanded="false" aria-controls="streaming-content">
+                  <span class="streaming-title">Where to Watch</span>
+                  <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="streaming-content" id="streaming-content" style="display: none;">
+                  <div class="streaming-providers" id="streaming-providers"></div>
+                </div>
+              </div>
             </div>
           </div>
         `;
@@ -181,6 +193,21 @@
               if (tmdbMovie.overview) {
                 const descEl = $('#detail-movie-description');
                 if (descEl) descEl.textContent = tmdbMovie.overview;
+              }
+              
+              // Fetch and display streaming providers
+              try {
+                const streamingUrl = `https://api.themoviedb.org/3/${tmdbMovie.type}/${tmdbMovie.id}/watch/providers?api_key=${TMDB_API_KEY}&region=US`;
+                const streamingResponse = await fetch(streamingUrl);
+                
+                if (streamingResponse.ok) {
+                  const streamingData = await streamingResponse.json();
+                  if (streamingData.results && streamingData.results.US) {
+                    displayStreamingProviders(streamingData.results.US, streamingData.results.US.link || '', cleanedTitle, tmdbMovie);
+                  }
+                }
+              } catch (streamingError) {
+                console.warn('Could not fetch streaming providers:', streamingError);
               }
             }
           }
@@ -315,6 +342,97 @@
     }
 
     btn.disabled = false;
+  }
+
+  // Display streaming providers
+  function displayStreamingProviders(providerData, watchLink, movieTitle, tmdbMovie) {
+    const streamingSection = $('#streaming-section');
+    const streamingProvidersEl = $('#streaming-providers');
+    
+    if (!streamingSection || !streamingProvidersEl) return;
+    
+    let htmlContent = '';
+    
+    // Display available services (streaming)
+    if (providerData.flatrate && providerData.flatrate.length > 0) {
+      htmlContent += '<div class="streaming-category">';
+      htmlContent += '<h3 class="streaming-service-label">Available to Stream:</h3>';
+      htmlContent += '<div class="streaming-logos">';
+      
+      providerData.flatrate.forEach(provider => {
+        const providerUrl = getProviderUrl(provider.provider_id, provider.provider_name, 'stream', watchLink, movieTitle, tmdbMovie);
+        htmlContent += `
+          <a href="${providerUrl}" target="_blank" rel="noopener noreferrer" class="streaming-provider-link" title="Watch on ${provider.provider_name}">
+            <div class="streaming-provider">
+              <img src="https://image.tmdb.org/t/p/original${provider.logo_path}" alt="${provider.provider_name}" class="provider-logo" />
+              <span class="provider-name">${provider.provider_name}</span>
+            </div>
+          </a>
+        `;
+      });
+      
+      htmlContent += '</div></div>';
+    }
+    
+    // Display rent/buy services
+    if (providerData.rent && providerData.rent.length > 0) {
+      htmlContent += '<div class="streaming-category">';
+      htmlContent += '<h3 class="streaming-service-label">Rent or Buy:</h3>';
+      htmlContent += '<div class="streaming-logos">';
+      
+      providerData.rent.forEach(provider => {
+        const providerUrl = getProviderUrl(provider.provider_id, provider.provider_name, 'rent', watchLink, movieTitle, tmdbMovie);
+        htmlContent += `
+          <a href="${providerUrl}" target="_blank" rel="noopener noreferrer" class="streaming-provider-link" title="Rent or buy on ${provider.provider_name}">
+            <div class="streaming-provider">
+              <img src="https://image.tmdb.org/t/p/original${provider.logo_path}" alt="${provider.provider_name}" class="provider-logo" />
+              <span class="provider-name">${provider.provider_name}</span>
+            </div>
+          </a>
+        `;
+      });
+      
+      htmlContent += '</div></div>';
+    }
+    
+    // Only show the section if there are providers to display
+    if (htmlContent) {
+      streamingProvidersEl.innerHTML = htmlContent;
+      streamingSection.style.display = 'block';
+      
+      // Set up the collapsible toggle
+      setupStreamingToggle();
+    }
+  }
+
+  // Setup streaming section toggle functionality
+  function setupStreamingToggle() {
+    const toggleBtn = $('#streaming-toggle');
+    const streamingContent = $('#streaming-content');
+    
+    if (!toggleBtn || !streamingContent) return;
+    
+    toggleBtn.addEventListener('click', () => {
+      const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+      
+      if (isExpanded) {
+        // Close the section
+        streamingContent.style.display = 'none';
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        toggleBtn.classList.remove('expanded');
+      } else {
+        // Open the section
+        streamingContent.style.display = 'block';
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        toggleBtn.classList.add('expanded');
+      }
+    });
+  }
+
+  // Get provider URL - always returns TMDB watch link
+  function getProviderUrl(providerId, providerName, type, watchLink, movieTitle, tmdbMovie) {
+    // Return the TMDB watch link for all providers
+    return watchLink || `https://www.themoviedb.org/${tmdbMovie.type}/${tmdbMovie.id}`;
   }
 
 })();

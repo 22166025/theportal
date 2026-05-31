@@ -62,6 +62,12 @@ async function updateNavbarAuth() {
     wishlistItem.setAttribute('data-auth-link', 'true');
     wishlistItem.innerHTML = `<a href="wishlist.html" class="nav-link" aria-label="View your wishlist">Wishlist</a>`;
 
+    const recommendationItem = document.createElement('li');
+    recommendationItem.className = 'nav-item';
+    recommendationItem.setAttribute('role', 'none');
+    recommendationItem.setAttribute('data-auth-link', 'true');
+    recommendationItem.innerHTML = `<a href="recommendation.html" class="nav-link" aria-label="Get movie recommendations">Recommendations</a>`;
+
     const profileItem = document.createElement('li');
     profileItem.className = 'nav-item';
     profileItem.setAttribute('role', 'none');
@@ -81,7 +87,8 @@ async function updateNavbarAuth() {
     
     if (boredLink) {
       const boredItem = boredLink.closest('.nav-item');
-      boredItem.after(wishlistItem);
+      boredItem.after(recommendationItem);
+      recommendationItem.after(wishlistItem);
       wishlistItem.after(profileItem);
       profileItem.after(logoutItem);
     } else {
@@ -89,7 +96,8 @@ async function updateNavbarAuth() {
       const themeToggle = navMenu.querySelector('.theme-toggle');
       if (themeToggle) {
         const themeItem = themeToggle.closest('.nav-item');
-        themeItem.before(wishlistItem);
+        themeItem.before(recommendationItem);
+        recommendationItem.after(wishlistItem);
         wishlistItem.after(profileItem);
         profileItem.after(logoutItem);
       }
@@ -100,7 +108,7 @@ async function updateNavbarAuth() {
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('authToken');
-        window.location.href = '/signin.html';
+        window.location.href = '/';
       });
     }
   } else {

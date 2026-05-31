@@ -279,7 +279,6 @@
     lastFocusedElement = document.activeElement;
 
     backdrop.hidden = false;
-    document.body.style.overflow = 'hidden';
 
     // Focus the modal container itself
     const modal = backdrop.querySelector('.modal');
@@ -301,7 +300,6 @@
     if (!backdrop) return;
 
     backdrop.hidden = true;
-    document.body.style.overflow = '';
     backdrop.removeEventListener('keydown', trapFocus);
     announce('Modal closed');
 

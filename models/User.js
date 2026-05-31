@@ -39,6 +39,14 @@ const userSchema = new mongoose.Schema({
     minlength: [6, 'Password must be at least 6 characters'],
     select: false, // Don't return password by default
   },
+  resetPasswordToken: {
+    type: String,
+    select: false,
+  },
+  resetPasswordExpire: {
+    type: Date,
+    select: false,
+  },
   wishlist: [wishlistItemSchema],
   createdAt: {
     type: Date,
@@ -68,6 +76,17 @@ userSchema.pre('save', async function (next) {
 // Method to compare passwords
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Method to create password reset token
+userSchema.methods.createPasswordResetToken = function () {
+  const crypto = require('crypto');
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  
+  this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  this.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 minutes
+  
+  return resetToken;
 };
 
 // Method to get user without password

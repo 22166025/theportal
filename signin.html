@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -156,7 +156,70 @@
       opacity: 0.6;
       pointer-events: none;
     }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal[aria-hidden="false"] {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      margin: auto;
+    }
+
+    .modal-content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--primary-muted);
+      color: var(--primary);
+    }
   </style>
+  <script>
+    // Apply saved theme immediately to prevent flash of unstyled content
+    const savedTheme = localStorage.getItem('portal-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -236,9 +299,59 @@
         <div class="auth-link">
           Don't have an account? <a href="register.html">Register</a>
         </div>
+
+        <div class="auth-link" style="margin-top: 12px;">
+          <a href="#" id="forgot-password-link">Forgot your password?</a>
+        </div>
       </form>
     </div>
   </main>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal" id="forgot-password-modal" role="dialog" aria-labelledby="forgot-password-title" aria-hidden="true" style="display: none;">
+    <div class="modal-content">
+      <button class="modal-close" id="forgot-password-close" aria-label="Close forgot password dialog">×</button>
+      <h2 id="forgot-password-title">Reset Your Password</h2>
+      
+      <form id="forgot-password-form" novalidate style="margin-top: 20px;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
+          Enter your email address to reset your password.
+        </p>
+
+        <div id="forgot-password-message-container"></div>
+
+        <div class="form-group">
+          <label for="forgot-email">Email Address</label>
+          <input type="email" id="forgot-email" name="email" placeholder="john@example.com" required />
+          <div class="field-error" id="forgot-email-error">Email address is required</div>
+        </div>
+
+        <button type="submit" class="btn-primary">Continue</button>
+      </form>
+
+      <form id="reset-password-form" novalidate style="display: none; margin-top: 20px;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
+          Enter your new password.
+        </p>
+
+        <div id="reset-password-message-container"></div>
+
+        <div class="form-group">
+          <label for="new-password">New Password</label>
+          <input type="password" id="new-password" name="password" placeholder="Enter new password (min 6 characters)" required />
+          <div class="field-error" id="new-password-error">Password must be at least 6 characters</div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm new password" required />
+          <div class="field-error" id="confirm-password-error">Passwords must match</div>
+        </div>
+
+        <button type="submit" class="btn-primary">Reset Password</button>
+      </form>
+    </div>
+  </div>
 
   <div id="live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
@@ -336,6 +449,155 @@
         messageContainer.innerHTML = `<div class="error-message">An error occurred. Please try again.</div>`;
         button.disabled = false;
         console.error('Sign in error:', error);
+      }
+    });
+
+    /* ============================================================
+       FORGOT PASSWORD FUNCTIONALITY
+       ============================================================ */
+    const forgotPasswordLink = document.getElementById('forgot-password-link');
+    const forgotPasswordModal = document.getElementById('forgot-password-modal');
+    const forgotPasswordClose = document.getElementById('forgot-password-close');
+    const forgotPasswordForm = document.getElementById('forgot-password-form');
+    const resetPasswordForm = document.getElementById('reset-password-form');
+
+    let resetEmail = ''; // Store email for password reset
+
+    // Helper function for email validation
+    function isValidEmail(email) {
+      return email.includes('@') && email.includes('.') && email.indexOf('@') < email.lastIndexOf('.') && email.lastIndexOf('.') < email.length - 1;
+    }
+
+    // Open forgot password modal
+    forgotPasswordLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      forgotPasswordModal.style.display = 'flex';
+      forgotPasswordModal.setAttribute('aria-hidden', 'false');
+      document.getElementById('forgot-email').focus();
+    });
+
+    // Close forgot password modal
+    forgotPasswordClose.addEventListener('click', () => {
+      closeForgotPasswordModal();
+    });
+
+    // Close on backdrop click
+    forgotPasswordModal.addEventListener('click', (e) => {
+      if (e.target === forgotPasswordModal) {
+        closeForgotPasswordModal();
+      }
+    });
+
+    function closeForgotPasswordModal() {
+      forgotPasswordModal.style.display = 'none';
+      forgotPasswordModal.setAttribute('aria-hidden', 'true');
+      forgotPasswordForm.style.display = 'block';
+      resetPasswordForm.style.display = 'none';
+      forgotPasswordForm.reset();
+      resetPasswordForm.reset();
+      document.getElementById('forgot-password-message-container').innerHTML = '';
+      document.getElementById('reset-password-message-container').innerHTML = '';
+      resetEmail = '';
+    }
+
+    // Handle forgot password form submission (email verification)
+    forgotPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('forgot-email').value.trim();
+      const messageContainer = document.getElementById('forgot-password-message-container');
+      const button = e.target.querySelector('button');
+
+      messageContainer.innerHTML = '';
+
+      // Validate email
+      if (!email || !isValidEmail(email)) {
+        messageContainer.innerHTML = '<div class="error-message">Please enter a valid email address</div>';
+        return;
+      }
+
+      button.disabled = true;
+
+      try {
+        const response = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          messageContainer.innerHTML = `<div class="error-message">${data.error || 'Failed to process request'}</div>`;
+          button.disabled = false;
+          return;
+        }
+
+        // Email verified, store it and show password reset form
+        resetEmail = email;
+        messageContainer.innerHTML = '<div class="success-message">Email verified! Please enter your new password.</div>';
+
+        // Show reset password form
+        setTimeout(() => {
+          forgotPasswordForm.style.display = 'none';
+          resetPasswordForm.style.display = 'block';
+          document.getElementById('new-password').focus();
+        }, 800);
+      } catch (error) {
+        messageContainer.innerHTML = '<div class="error-message">An error occurred. Please try again.</div>';
+        button.disabled = false;
+        console.error('Forgot password error:', error);
+      }
+    });
+
+    // Handle reset password form submission
+    resetPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const messageContainer = document.getElementById('reset-password-message-container');
+      const button = e.target.querySelector('button');
+
+      messageContainer.innerHTML = '';
+
+      // Validate fields
+      if (!newPassword || newPassword.length < 6) {
+        messageContainer.innerHTML = '<div class="error-message">Password must be at least 6 characters</div>';
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        messageContainer.innerHTML = '<div class="error-message">Passwords do not match</div>';
+        return;
+      }
+
+      button.disabled = true;
+
+      try {
+        const response = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: resetEmail, newPassword, confirmPassword }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          messageContainer.innerHTML = `<div class="error-message">${data.error || 'Failed to reset password'}</div>`;
+          button.disabled = false;
+          return;
+        }
+
+        messageContainer.innerHTML = '<div class="success-message">Password reset successfully! Redirecting to sign in...</div>';
+
+        setTimeout(() => {
+          closeForgotPasswordModal();
+        }, 2000);
+      } catch (error) {
+        messageContainer.innerHTML = '<div class="error-message">An error occurred. Please try again.</div>';
+        button.disabled = false;
+        console.error('Reset password error:', error);
       }
     });
   </script>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -166,7 +166,81 @@
     .view-mode.hidden {
       display: none;
     }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal[aria-hidden="false"] {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      margin: auto;
+    }
+
+    .modal-content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--primary-muted);
+      color: var(--primary);
+    }
+
+    .field-error {
+      color: #dc3545;
+      font-size: 0.8rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .field-error.show {
+      display: block;
+    }
   </style>
+  <script>
+    // Apply saved theme immediately to prevent flash of unstyled content
+    const savedTheme = localStorage.getItem('portal-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -239,6 +313,7 @@
           <div class="form-actions">
             <button class="btn btn-primary" id="edit-btn">Edit Profile</button>
             <button class="btn btn-secondary" id="wishlist-btn">View Wishlist</button>
+            <button class="btn btn-secondary" id="change-password-btn">Change Password</button>
           </div>
         </div>
 
@@ -267,6 +342,39 @@
       </div>
     </div>
   </main>
+
+  <!-- Change Password Modal -->
+  <div class="modal" id="change-password-modal" role="dialog" aria-labelledby="change-password-title" aria-hidden="true" style="display: none;">
+    <div class="modal-content">
+      <button class="modal-close" id="change-password-close" aria-label="Close change password dialog">×</button>
+      <h2 id="change-password-title">Change Password</h2>
+      
+      <form id="change-password-form" novalidate style="margin-top: 20px;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
+          Enter your new password.
+        </p>
+
+        <div id="change-password-message-container"></div>
+
+        <div class="form-group">
+          <label for="new-pwd">New Password</label>
+          <input type="password" id="new-pwd" name="newPassword" placeholder="Enter new password (min 6 characters)" required />
+          <div class="field-error" id="new-pwd-error">Password must be at least 6 characters</div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm-pwd">Confirm New Password</label>
+          <input type="password" id="confirm-pwd" name="confirmPassword" placeholder="Confirm new password" required />
+          <div class="field-error" id="confirm-pwd-error">Passwords must match</div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Change Password</button>
+          <button type="button" class="btn btn-secondary" id="change-password-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div id="live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
@@ -377,10 +485,136 @@
       window.location.href = '/wishlist.html';
     });
 
-    document.getElementById('logout-btn').addEventListener('click', () => {
-      localStorage.removeItem('authToken');
-      window.location.href = '/signin.html';
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('authToken');
+        window.location.href = '/';
+      });
+    }
+
+    /* ============================================================
+       CHANGE PASSWORD FUNCTIONALITY
+       ============================================================ */
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const changePasswordModal = document.getElementById('change-password-modal');
+    const changePasswordClose = document.getElementById('change-password-close');
+    const changePasswordCancel = document.getElementById('change-password-cancel');
+    const changePasswordForm = document.getElementById('change-password-form');
+
+    console.log('Change Password Elements:', {
+      btn: changePasswordBtn,
+      modal: changePasswordModal,
+      close: changePasswordClose,
+      cancel: changePasswordCancel,
+      form: changePasswordForm
     });
+
+    // Only set up event listeners if all elements exist
+    if (changePasswordBtn && changePasswordModal && changePasswordClose && changePasswordCancel && changePasswordForm) {
+      // Open change password modal
+      changePasswordBtn.addEventListener('click', () => {
+        changePasswordModal.style.display = 'flex';
+        changePasswordModal.setAttribute('aria-hidden', 'false');
+        document.getElementById('new-pwd').focus();
+      });
+
+      // Close change password modal
+      changePasswordClose.addEventListener('click', () => {
+        closeChangePasswordModal();
+      });
+
+      changePasswordCancel.addEventListener('click', () => {
+        closeChangePasswordModal();
+      });
+
+      // Close on backdrop click
+      changePasswordModal.addEventListener('click', (e) => {
+        if (e.target === changePasswordModal) {
+          closeChangePasswordModal();
+        }
+      });
+
+      function closeChangePasswordModal() {
+        changePasswordModal.style.display = 'none';
+        changePasswordModal.setAttribute('aria-hidden', 'true');
+        changePasswordForm.reset();
+        document.getElementById('change-password-message-container').innerHTML = '';
+      }
+
+      // Handle change password form submission
+      changePasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const newPassword = document.getElementById('new-pwd').value;
+        const confirmPassword = document.getElementById('confirm-pwd').value;
+        const messageContainer = document.getElementById('change-password-message-container');
+        const button = e.target.querySelector('button[type="submit"]');
+
+        messageContainer.innerHTML = '';
+
+        // Validate fields
+        if (!newPassword || newPassword.length < 6) {
+          messageContainer.innerHTML = '<div class="error-message">New password must be at least 6 characters</div>';
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          messageContainer.innerHTML = '<div class="error-message">Passwords do not match</div>';
+          return;
+        }
+
+        button.disabled = true;
+
+        try {
+          const token = localStorage.getItem('authToken');
+          const response = await fetch('/api/user/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to get user email');
+          }
+
+          const userData = await response.json();
+          const email = userData.user.email;
+
+          // Use the reset-password endpoint to update password
+          const resetResponse = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, newPassword, confirmPassword }),
+          });
+
+          const data = await resetResponse.json();
+
+          if (!resetResponse.ok) {
+            messageContainer.innerHTML = `<div class="error-message">${data.error || 'Failed to change password'}</div>`;
+            button.disabled = false;
+            return;
+          }
+
+          messageContainer.innerHTML = '<div class="success-message">Password changed successfully!</div>';
+          
+          setTimeout(() => {
+            closeChangePasswordModal();
+            // Show success message in main container
+            document.getElementById('message-container').innerHTML = '<div class="success-message">Your password has been changed successfully!</div>';
+            setTimeout(() => {
+              document.getElementById('message-container').innerHTML = '';
+            }, 3000);
+          }, 1500);
+        } catch (error) {
+          messageContainer.innerHTML = '<div class="error-message">An error occurred. Please try again.</div>';
+          button.disabled = false;
+          console.error('Change password error:', error);
+        }
+      });
+    } else {
+      console.warn('Change Password elements not found');
+    }
   </script>
 </body>
 </html>

@@ -176,22 +176,44 @@
         const csvText = await response.text();
         const movies = parseCSV(csvText);
         
-        // Filter: Genre AND Your Rating > 7
-        const genreMovies = movies.filter(movie => {
-          const genres = movie.Genres || '';
-          const myRating = parseFloat(movie['Your Rating'] || 0);
-          return genres.toLowerCase().includes(genreName.toLowerCase()) && myRating > 7;
-        });
+        // Filter: genre-based or language-based lists AND Your Rating > 7
+        let listMovies = [];
+        const myRatingFor = (movie) => parseFloat(movie['Your Rating'] || 0);
+
+        if (config.filterType === 'language') {
+          // Language detection using Unicode ranges where possible
+          const lang = config.lang;
+          const matchers = {
+            bangla: /[\u0980-\u09FF]/,
+            korean: /[\uAC00-\uD7AF]/,
+            malayalam: /[\u0D00-\u0D7F]/,
+            international: /[^\x00-\x7F]/ // any non-ASCII character
+          };
+          const re = matchers[lang] || matchers.international;
+
+          listMovies = movies.filter(movie => {
+            const text = `${movie.Title || ''} ${movie['Original Title'] || ''}`;
+            const myRating = myRatingFor(movie);
+            return re.test(text) && myRating > 7;
+          });
+        } else {
+          // Genre matching
+          listMovies = movies.filter(movie => {
+            const genres = movie.Genres || '';
+            const myRating = myRatingFor(movie);
+            return genres.toLowerCase().includes(genreName.toLowerCase()) && myRating > 7;
+          });
+        }
         
         // Sort by Release Date descending (latest first)
-        genreMovies.sort((a, b) => {
+        listMovies.sort((a, b) => {
           const dateA = parseDate(a['Release Date'] || '');
           const dateB = parseDate(b['Release Date'] || '');
           return dateB - dateA;
         });
         
         // Get top 10 movies
-        const topTenMovies = genreMovies.slice(0, 10);
+        const topTenMovies = listMovies.slice(0, 10);
         
         // Populate the modal list
         listElement.innerHTML = '';
@@ -306,6 +328,11 @@
     { genreName: 'Sci-Fi', toggleBtnId: 'scifi-toggle', modalId: 'scifi-modal', listId: 'scifi-list', cardPosterId: 'scifi-poster-preview', cardPlaceholderId: 'scifi-poster-placeholder', cardImgId: 'scifi-poster-img' },
     { genreName: 'Fantasy', toggleBtnId: 'fantasy-toggle', modalId: 'fantasy-modal', listId: 'fantasy-list', cardPosterId: 'fantasy-poster-preview', cardPlaceholderId: 'fantasy-poster-placeholder', cardImgId: 'fantasy-poster-img' },
     { genreName: 'Action', toggleBtnId: 'action-toggle', modalId: 'action-modal', listId: 'action-list', cardPosterId: 'action-poster-preview', cardPlaceholderId: 'action-poster-placeholder', cardImgId: 'action-poster-img' },
+    // Language-based lists
+    { genreName: 'Bangla', toggleBtnId: 'bangla-toggle', modalId: 'bangla-modal', listId: 'bangla-list', cardPosterId: 'bangla-poster-preview', cardPlaceholderId: 'bangla-poster-placeholder', cardImgId: 'bangla-poster-img', filterType: 'language', lang: 'bangla' },
+    { genreName: 'Korean', toggleBtnId: 'korean-toggle', modalId: 'korean-modal', listId: 'korean-list', cardPosterId: 'korean-poster-preview', cardPlaceholderId: 'korean-poster-placeholder', cardImgId: 'korean-poster-img', filterType: 'language', lang: 'korean' },
+    { genreName: 'Malayalam', toggleBtnId: 'malayalam-toggle', modalId: 'malayalam-modal', listId: 'malayalam-list', cardPosterId: 'malayalam-poster-preview', cardPlaceholderId: 'malayalam-poster-placeholder', cardImgId: 'malayalam-poster-img', filterType: 'language', lang: 'malayalam' },
+    { genreName: 'International', toggleBtnId: 'international-toggle', modalId: 'international-modal', listId: 'international-list', cardPosterId: 'international-poster-preview', cardPlaceholderId: 'international-poster-placeholder', cardImgId: 'international-poster-img', filterType: 'language', lang: 'international' },
   ];
 
   genres.forEach(config => {
