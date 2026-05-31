@@ -1,10 +1,9 @@
 # ThePortal 🎬
 
-**Your Lists, Elevated** – A modern web application for discovering, organizing, and sharing your favorite movies.
+**Your Lists, Elevated** – A modern web application for discovering, and organizing movies that match your taste.
 
 [![Live Demo](https://img.shields.io/badge/Demo-theportal.onrender.com-blue?style=flat-square)](https://theportal.onrender.com)
 [![GitHub](https://img.shields.io/badge/GitHub-22166025/theportal-black?style=flat-square)](https://github.com/22166025/theportal)
-[![License](https://img.shields.io/badge/License-Open%20Source-green?style=flat-square)](#license)
 
 ---
 
@@ -13,7 +12,6 @@
 ### Movie Discovery
 - 🔍 **Smart Search** – Find movies instantly with real-time search results
 - 🎯 **Genre-Based Collections** – Browse curated lists of Thriller, Romance, Horror, Drama, Comedy, Sci-Fi, Fantasy, and Action movies
-- 🎬 **Movie Details** – View posters, ratings, genres, and descriptions from TMDB
 - ⭐ **Rating System** – See both IMDb ratings and personal ratings
 
 ### User Features
@@ -26,8 +24,6 @@
 - 🎭 **Random Movie Quotes** – Discover interesting quotes from movies
 - 🌌 **Astronomy Picture of the Day** – NASA APOD integration
 - 📖 **Daily Quotes** – Inspiring quotes from famous authors
-- 🎲 **Bored Feature** – Get recommendations when you can't decide what to watch
-
 ---
 
 ## 🚀 Live Demo
